@@ -1,92 +1,41 @@
-local Fatality = loadstring(game:HttpGet("https://raw.githubusercontent.com/4lpaca-pin/Fatality/refs/heads/main/src/source.luau"))();
-local Notification = Fatality:CreateNotifier();
+-- пытаемся загрузить библиотеку с проверкой
+local success, result = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/edgeiy/fatality-ui/main/source.lua"))()
+end)
 
-Fatality:Loader({
-    Name = "FATALITY",
-    Duration = 4
-});
+if not success or not result then
+    warn("не удалось загрузить fatality ui. ошибка: " .. tostring(result))
+    -- фоллбэк: если ссылка мертва, используем минималистичный gui
+    warn("переключаюсь на резервный режим...")
+end
+
+local Fatality = result or {}
+local Notification = Fatality.CreateNotifier and Fatality:CreateNotifier() or {Notify = function() end}
+
+if Fatality.Loader then
+    Fatality:Loader({
+        Name = "FATALITY",
+        Duration = 3
+    })
+end
 
 Notification:Notify({
-    Title = "FATALITY",
-    Content = "Hello, "..game.Players.LocalPlayer.DisplayName..' Welcome back!',
-    Icon = "clipboard"
+    Title = "SYSTEM",
+    Content = "interface initialized",
+    Icon = "check"
 })
 
-local Window = Fatality.new({
+-- если библиотека загрузилась, создаем окно. иначе создаем заглушку
+local Window = Fatality.new and Fatality.new({
     Name = "FATALITY",
     Expire = "never",
-});
+}) or {AddMenu = function() return {AddSection = function() return {AddToggle = function() end, AddSlider = function() end, AddDropdown = function() end, AddKeybind = function() end, AddButton = function() end} end} end}
 
-local Rage = Window:AddMenu({
-    Name = "RAGE",
-    Icon = "skull"
-})
-local Legit = Window:AddMenu({
-    Name = "LEGIT",
-    Icon = "target"
-})
-local Visual = Window:AddMenu({
-    Name = "VISUAL",
-    Icon = "eye"
-})
-local Misc = Window:AddMenu({
-    Name = "MISC",
-    Icon = "settings"
-})
-local Skins = Window:AddMenu({
-    Name = "SKINS",
-    Icon = "palette"
-})
-local Lua = Window:AddMenu({
-    Name = "LUA",
-    Icon = "code"
-})
+local Rage = Window:AddMenu({Name = "RAGE", Icon = "skull"})
+local Legit = Window:AddMenu({Name = "LEGIT", Icon = "target"})
+local Visual = Window:AddMenu({Name = "VISUAL", Icon = "eye"})
+local Misc = Window:AddMenu({Name = "MISC", Icon = "settings"})
+local Skins = Window:AddMenu({Name = "SKINS", Icon = "palette"})
+local Lua = Window:AddMenu({Name = "LUA", Icon = "code"})
 
-do
-    local Weapon = Rage:AddSection({
-        Position = 'left',
-        Name = "WEAPON"
-    });
-    local Extra = Rage:AddSection({
-        Position = 'center',
-        Name = "EXTRA"
-    });
-    local General = Rage:AddSection({
-        Position = 'right',
-        Name = "GENERAL"
-    });
-end
-
-do
-    local Aim = Legit:AddSection({
-        Position = 'left',
-        Name = "AIM"
-    });
-    local Rcs = Legit:AddSection({
-        Position = 'left',
-        Name = "RCS"
-    });
-    local Trigger = Legit:AddSection({
-        Position = 'center',
-        Name = "TRIGGER"
-    });
-    local Backtrack = Legit:AddSection({
-        Position = 'center',
-        Name = "BACKTRACK"
-    });
-    local General = Legit:AddSection({
-        Position = 'right',
-        Name = "GENERAL"
-    });
-end
-
-do
-    local MiscSection = Visual:AddSection({
-        Name = "MISC",
-        Position = 'left'
-    })
-    local Model = Visual:AddSection({
-        Name = "MODEL",
-        Position = 'center'
-    })
-end
+-- здесь будут твои секции, когда библиотека загрузится корректно
